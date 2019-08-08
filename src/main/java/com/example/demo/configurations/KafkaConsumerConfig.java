@@ -21,7 +21,7 @@ public class KafkaConsumerConfig {
     private String bootstrapAddress;
 
     @Bean
-    public ConsumerFactory<String, String> consumerFactory(String groupId){
+    public ConsumerFactory<String, String> consumerFactory(){
         Map<String, Object> props = new HashMap<>();
         props.put(
                 ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
@@ -29,7 +29,7 @@ public class KafkaConsumerConfig {
         );
         props.put(
                 ConsumerConfig.GROUP_ID_CONFIG,
-                groupId
+                "foo"
         );
         props.put(
                 ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,

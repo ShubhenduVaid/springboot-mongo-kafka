@@ -3,6 +3,9 @@ package com.example.demo;
 import com.example.demo.models.Pets;
 import com.example.demo.repositories.PetsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,11 +18,27 @@ import org.bson.types.ObjectId;
 @RestController
 @RequestMapping("/pets")
 public class PetsController {
+
+    @Value(value="${test.topic.name}")
+    private String testTopicName;
+
+    @Autowired
+    private KafkaTemplate<String, String> kafkaTemplate;
+
+    @KafkaListener(topics = "test")
+
+    public void listen(String message){
+        System.out.println("Recieved message " + message);
+    }
+
     @Autowired
     private PetsRepository repository;
 
     @RequestMapping(value = "", method = RequestMethod.GET)
     public List<Pets> getAllPets() {
+        // test //
+            kafkaTemplate.send(testTopicName,"Hello");
+        //////////
         return repository.findAll();
     }
 
