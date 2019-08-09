@@ -54,4 +54,13 @@ public class Pets {
         this.breed = breed;
     }
 
+    @Override
+    public String toString() {
+        return "Pets{" +
+                "_id=" + _id +
+                ", name='" + name + '\'' +
+                ", species='" + species + '\'' +
+                ", breed='" + breed + '\'' +
+                '}';
+    }
 }

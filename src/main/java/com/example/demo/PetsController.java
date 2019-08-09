@@ -11,24 +11,39 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
 import javax.validation.Valid;
 import java.util.List;
+
 import org.bson.types.ObjectId;
 
 @RestController
 @RequestMapping("/pets")
 public class PetsController {
 
-    @Value(value="${test.topic.name}")
+    @Value(value = "${test.topic.name}")
     private String testTopicName;
+
+    @Value(value = "${test1.topic.name}")
+    private String test1TopicName;
 
     @Autowired
     private KafkaTemplate<String, String> kafkaTemplate;
 
-    @KafkaListener(topics = "test")
+    @Autowired
+    private KafkaTemplate<String, Pets> petsKafkaTemplate;
 
-    public void listen(String message){
-        System.out.println("Recieved message " + message);
+    @KafkaListener(topics = "test")
+    public void listen(String message) {
+        System.out.println("Recieved message String : " + message);
+    }
+
+    @KafkaListener(
+            topics = "test1",
+            containerFactory = "petsKafkaListenerContainerFactory"
+    )
+    public void petsListener(Pets pets) {
+        System.out.println("Recieved message JSON : " + pets.toString());
     }
 
     @Autowired
@@ -37,7 +52,13 @@ public class PetsController {
     @RequestMapping(value = "", method = RequestMethod.GET)
     public List<Pets> getAllPets() {
         // test //
-            kafkaTemplate.send(testTopicName,"Hello");
+        kafkaTemplate.send(testTopicName, "Hello");
+        Pets pets = new Pets();
+        pets.set_id(ObjectId.get());
+        pets.setBreed("testBreed");
+        pets.setName("testName");
+        pets.setSpecies("testSpecies");
+        petsKafkaTemplate.send(test1TopicName, pets);
         //////////
         return repository.findAll();
     }
